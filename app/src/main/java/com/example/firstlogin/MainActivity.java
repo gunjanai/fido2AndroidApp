@@ -28,7 +28,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
-    private String url = "https://run.mocky.io/v3/85cf9aaf-aa4f-41bf-b10c-308f032f7ccc";
+    private String url = "http://192.168.29.207:8000/requestGetMakeCredentialOptions";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +43,26 @@ public class MainActivity extends AppCompatActivity {
         mRequestQueue = Volley.newRequestQueue(this);
 
         // String Request initialized
-        mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 //            @Override
             public void onResponse(String response) {
 
-                Toast.makeText(getApplicationContext(), "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
-            }
+                Log.d("Response :", response.toString());
+                try{
+                    Fido2ApiClient fido2ApiClient = Fido.getFido2ApiClient(this.getApplicationContext());
+
+                    Task<Fido2PendingIntent> result = fido2ApiClient.getRegisterPendingIntent(response);
+                    Log.d("Cred options: ", result.toString());
+//                    var task = client.getRegisterPendingIntent(apiResult.data);
+//                    Log.d("Public key credentials: ", task.await());
+
+
+        } catch (e Exception) {
+            Log.e(TAG, "Cannot call registerRequest", e);
+        }
+                }
+
+
         }, new Response.ErrorListener() {
 //            @Override
             public void onErrorResponse(VolleyError error) {
