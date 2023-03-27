@@ -2,6 +2,7 @@ package com.example.firstlogin;
 
 import androidx.appcompat.app.AppCompatActivity;
 
+import android.app.PendingIntent;
 import android.os.Bundle;
 import android.widget.TextView;
 import static android.content.ContentValues.TAG;
@@ -9,6 +10,11 @@ import static android.content.ContentValues.TAG;
 import com.android.volley.RequestQueue;
 import com.android.volley.toolbox.StringRequest;
 import com.android.volley.toolbox.Volley;
+import com.google.android.gms.fido.Fido;
+import com.google.android.gms.fido.fido2.Fido2ApiClient;
+import com.google.android.gms.fido.fido2.Fido2PendingIntent;
+import com.google.android.gms.fido.fido2.api.common.PublicKeyCredentialCreationOptions;
+import com.google.android.gms.tasks.Task;
 import com.google.android.material.button.MaterialButton;
 import android.util.Log;
 import android.widget.Toast;
@@ -28,7 +34,7 @@ public class MainActivity extends AppCompatActivity {
 
     private RequestQueue mRequestQueue;
     private StringRequest mStringRequest;
-    private String url = "https://run.mocky.io/v3/85cf9aaf-aa4f-41bf-b10c-308f032f7ccc";
+    private String url = "http://192.168.1.4:8000/requestGetMakeCredentialOptions";
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -43,12 +49,28 @@ public class MainActivity extends AppCompatActivity {
         mRequestQueue = Volley.newRequestQueue(this);
 
         // String Request initialized
-        mStringRequest = new StringRequest(Request.Method.GET, url, new Response.Listener<String>() {
+        mStringRequest = new StringRequest(Request.Method.POST, url, new Response.Listener<String>() {
 //            @Override
             public void onResponse(String response) {
 
-                Toast.makeText(getApplicationContext(), "Response :" + response.toString(), Toast.LENGTH_LONG).show();//display the response on screen
-            }
+                Log.d("Response :", response.toString());
+                try{
+                    Fido2ApiClient fido2ApiClient = Fido.getFido2ApiClient(getApplicationContext());
+                    byte[] responseBytes = response.getBytes();
+
+                    Task<PendingIntent> result = fido2ApiClient.getRegisterPendingIntent(new PublicKeyCredentialCreationOptions(response));
+//                    Task<PendingIntent> result = fido2ApiClient.getRegisterPendingIntent(response);
+                    Log.d("Cred options: ", result.toString());
+//                    var task = client.getRegisterPendingIntent(apiResult.data);
+//                    Log.d("Public key credentials: ", task.await());
+
+
+        } catch (Exception e) {
+            Log.e(TAG, "Cannot call registerRequest", e);
+        }
+                }
+
+
         }, new Response.ErrorListener() {
 //            @Override
             public void onErrorResponse(VolleyError error) {
