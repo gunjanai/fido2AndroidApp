@@ -58,7 +58,8 @@ public class MainActivity extends AppCompatActivity {
                     Fido2ApiClient fido2ApiClient = Fido.getFido2ApiClient(getApplicationContext());
                     byte[] responseBytes = response.getBytes();
 
-                    Task<PendingIntent> result = fido2ApiClient.getRegisterPendingIntent(PublicKeyCredentialCreationOptions.deserializeFromBytes(responseBytes));
+                    Task<PendingIntent> result = fido2ApiClient.getRegisterPendingIntent(new PublicKeyCredentialCreationOptions(response));
+//                    Task<PendingIntent> result = fido2ApiClient.getRegisterPendingIntent(response);
                     Log.d("Cred options: ", result.toString());
 //                    var task = client.getRegisterPendingIntent(apiResult.data);
 //                    Log.d("Public key credentials: ", task.await());
